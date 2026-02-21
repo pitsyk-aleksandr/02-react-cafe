@@ -20,6 +20,9 @@ import VoteOptions from "../VoteOptions/VoteOptions";
 // Імпорт компонента VoteStats
 import VoteStats from "../VoteStats/VoteStats";
 
+// Імпорт компонента Notification
+import Notification from "../Notification/Notification";
+
 // Компонент App
 function App() {
   const [votes, setVotes] = useState<Votes>({
@@ -30,7 +33,7 @@ function App() {
 
   // Функція handleVote(type) - для оновлення стану голосів.
   // Використовується тип VoteType для типізації її параметра.
-  function handleVote(type: VoteType) {
+  function handleVote(type: VoteType): void {
     if (type === "good") {
       setVotes({
         ...votes,
@@ -52,7 +55,7 @@ function App() {
   }
 
   // Функція resetVotes() – для скидання стану.
-  function resetVotes() {
+  function resetVotes(): void {
     setVotes({
       good: 0,
       neutral: 0,
@@ -61,10 +64,13 @@ function App() {
   }
 
   // Підрахунок загальної кількості відгуків – це просто сума станів
-  const totalVotes = votes.good + votes.neutral + votes.bad;
+  const totalVotes: number = votes.good + votes.neutral + votes.bad;
+
+  // Встановлюємо булеве значення для відображення кнопки Reset
+  const canReset: boolean = totalVotes > 0 ? true : false;
 
   // Підрахунок відсотка позитивних відгуків
-  const positiveRate = totalVotes
+  const positiveRate: number = totalVotes
     ? Math.round((votes.good / totalVotes) * 100)
     : 0;
 
@@ -72,12 +78,20 @@ function App() {
     <>
       <div className={css.app}>
         <CafeInfo />
-        <VoteOptions onVote={handleVote} onReset={resetVotes} canReset={true} />
-        <VoteStats
-          votes={votes}
-          totalVotes={totalVotes}
-          positiveRate={positiveRate}
+        <VoteOptions
+          onVote={handleVote}
+          onReset={resetVotes}
+          canReset={canReset}
         />
+        {totalVotes > 0 ? (
+          <VoteStats
+            votes={votes}
+            totalVotes={totalVotes}
+            positiveRate={positiveRate}
+          />
+        ) : (
+          <Notification />
+        )}
       </div>
     </>
   );
